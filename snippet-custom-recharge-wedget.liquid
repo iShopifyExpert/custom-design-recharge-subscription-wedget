@@ -1,0 +1,315 @@
+{%- assign variant = product.selected_or_first_available_variant -%}
+{%- assign selling_plan = variant.selling_plan_allocations | first -%}
+{%- assign reg_price = variant.price | money -%}
+{%- assign compare_price = variant.compare_at_price | money -%}
+
+{%- assign sub_price = selling_plan.price | money -%}
+{%- assign price_diff = variant.price | minus: selling_plan.price -%}
+{%- assign discount_percent = price_diff | times: 100 | divided_by: variant.price | round -%}
+{%- assign has_discount = false -%}
+{% if selling_plan.price < variant.price %}
+  {%- assign has_discount = true -%}
+{% endif %}
+
+<div class="purchase-options">
+  <!-- Subscribe & Save -->
+  <label class="option-card {% if product.selling_plan_groups[0].selling_plan_selected %}selected{% endif %}">
+    <input type="radio" name="purchase_type" {% if product.selling_plan_groups[0].selling_plan_selected %}checked{% endif %}>
+    <div class="recommended-tag">Recommended</div>
+    <div class="option-header">
+      <div class="left">
+        <div class="option-title">Subscribe & Save</div>
+        <div class="option-subtitle">
+          {% if has_discount %}
+            Save <span class="highlight-red">{{ discount_percent }}% OFF</span>
+          {% else %}
+            Save <span class="highlight-red">20% OFF</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="right">
+        <div class="price-wrapper">
+          {% if has_discount %}
+            <span class="price-strike">{{ reg_price }}</span>
+            <span class="price">{{ sub_price }}</span>
+          {% else %}
+            <span class="price">{{ reg_price }}</span>
+          {% endif %}
+        </div>
+        <div class="price-note">Best Saving Offer</div>
+      </div>
+    </div>
+    {% if variant.selling_plan_allocations.size > 0 %}
+      <div class="frequency-selector">
+        <label for="selling_plan_selector" class="frequency-label">Delivery Frequency</label>
+        <select name="selling_plan" id="selling_plan_selector" class="frequency-dropdown">
+          {% for allocation in variant.selling_plan_allocations %}
+            {% assign plan = allocation.selling_plan %}
+            <option value="{{ plan.id }}">
+              {{ plan.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+    <div class="option-details">
+      <div class="benefit"><span class="icon"><svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.09583 4.18688C2.01989 4.42352 2.15016 4.67692 2.3868 4.75286C2.62344 4.82881 2.87684 4.69854 2.95278 4.4619L2.09583 4.18688ZM10.7569 2.27051L10.4233 2.57289L10.4331 2.58302L10.7569 2.27051ZM13.3212 5.38559C13.5697 5.38999 13.7747 5.19212 13.7791 4.94363L13.8509 0.894269C13.8553 0.64578 13.6574 0.440769 13.4089 0.436366C13.1604 0.431962 12.9554 0.629832 12.951 0.878321L12.8872 4.47776L9.28779 4.41396C9.0393 4.40956 8.83429 4.60743 8.82988 4.85592C8.82548 5.10441 9.02335 5.30942 9.27184 5.31382L13.3212 5.38559ZM1.14079 6.93082C0.892297 6.92641 0.687287 7.12428 0.682883 7.37277L0.611118 11.4221C0.606714 11.6706 0.804584 11.8756 1.05307 11.88C1.30156 11.8844 1.50657 11.6866 1.51098 11.4381L1.57477 7.83865L5.1742 7.90244C5.42269 7.90684 5.6277 7.70897 5.63211 7.46049C5.63651 7.212 5.43864 7.00699 5.19015 7.00258L1.14079 6.93082ZM3.70514 10.0459L4.03871 9.74352L4.02892 9.73338L3.70514 10.0459ZM12.3662 8.12953C12.4421 7.89289 12.3118 7.63949 12.0752 7.56354C11.8386 7.4876 11.5852 7.61787 11.5092 7.85451L12.3662 8.12953ZM2.52431 4.32439L2.95278 4.4619C3.2126 3.65231 3.65279 2.93302 4.22826 2.36905L3.91329 2.04766L3.59832 1.72626C2.91387 2.39704 2.39834 3.2443 2.09583 4.18688L2.52431 4.32439ZM3.91329 2.04766L4.22826 2.36905C4.80347 1.80533 5.49469 1.41534 6.23576 1.23046L6.12683 0.79384L6.0179 0.357222C5.11487 0.582511 4.28303 1.05523 3.59832 1.72626L3.91329 2.04766ZM6.12683 0.79384L6.23576 1.23046C6.97651 1.04565 7.74722 1.07064 8.47754 1.30357L8.61428 0.874843L8.75101 0.446119C7.86206 0.162603 6.92124 0.131855 6.0179 0.357222L6.12683 0.79384ZM8.61428 0.874843L8.47754 1.30357C9.20824 1.53661 9.87845 1.97152 10.4234 2.57274L10.7569 2.27051L11.0903 1.96829C10.4436 1.25493 9.6396 0.729519 8.75101 0.446119L8.61428 0.874843ZM10.7569 2.27051L10.4331 2.58302L13.0054 5.24817L13.3292 4.93566L13.653 4.62315L11.0806 1.958L10.7569 2.27051ZM1.13281 7.38075L0.809026 7.69326C1.3113 8.21366 1.95438 8.87994 2.4719 9.41613C2.73065 9.68422 2.95802 9.91979 3.12069 10.0883C3.20203 10.1726 3.26719 10.2401 3.31202 10.2866C3.33444 10.3098 3.35177 10.3278 3.3635 10.3399C3.36936 10.346 3.37382 10.3506 3.37682 10.3537C3.37832 10.3553 3.37945 10.3564 3.38021 10.3572C3.38058 10.3576 3.38088 10.3579 3.38106 10.3581C3.38114 10.3582 3.38125 10.3583 3.38128 10.3583C3.3813 10.3584 3.38132 10.3584 3.38133 10.3584C3.38134 10.3584 3.38135 10.3584 3.70514 10.0459C4.02892 9.73338 4.02892 9.73338 4.0289 9.73336C4.02889 9.73335 4.02888 9.73333 4.02885 9.73331C4.0288 9.73326 4.02873 9.73318 4.02864 9.73309C4.02844 9.73288 4.02817 9.7326 4.02778 9.7322C4.02703 9.73142 4.02589 9.73024 4.02439 9.72869C4.0214 9.72559 4.01693 9.72096 4.01107 9.71489C3.99934 9.70273 3.98201 9.68478 3.9596 9.66155C3.91477 9.61511 3.8496 9.54759 3.76826 9.46332C3.60559 9.29477 3.37822 9.0592 3.11947 8.79111C2.60196 8.25492 1.95888 7.58864 1.4566 7.06824L1.13281 7.38075ZM3.70514 10.0459L3.37173 10.3481C4.01837 11.0615 4.82239 11.5869 5.71097 11.8703L5.84771 11.4416L5.98444 11.0128C5.25375 10.7798 4.58354 10.3449 4.03854 9.74367L3.70514 10.0459ZM5.84771 11.4416L5.71097 11.8703C6.59992 12.1538 7.54075 12.1846 8.44409 11.9592L8.33516 11.5226L8.22623 11.0859C7.48548 11.2708 6.71477 11.2458 5.98444 11.0128L5.84771 11.4416ZM8.33516 11.5226L8.44409 11.9592C9.34711 11.7339 10.179 11.2612 10.8637 10.5901L10.5487 10.2687L10.2337 9.94736C9.65852 10.5111 8.9673 10.9011 8.22623 11.0859L8.33516 11.5226ZM10.5487 10.2687L10.8637 10.5901C11.5481 9.91937 12.0637 9.07211 12.3662 8.12953L11.9377 7.99202L11.5092 7.85451C11.2494 8.66409 10.8092 9.38338 10.2337 9.94736L10.5487 10.2687Z" fill="black"/></svg></span> 15% off on future orders</div>
+      <div class="benefit"><span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.74805 1.1582C11.6894 1.15837 14.8701 4.29993 14.8701 8.1582C14.8701 12.0165 11.6894 15.158 7.74805 15.1582C3.80659 15.1582 0.625 12.0166 0.625 8.1582C0.625 4.29983 3.80659 1.1582 7.74805 1.1582Z" stroke="#555552"/><line x1="5.70312" y1="5.6582" x2="5.70312" y2="10.6582" stroke="#555552"/><line x1="9.77344" y1="5.6582" x2="9.77344" y2="10.6582" stroke="#555552"/></svg></span> Pause or cancel at any time</div>
+      <div class="benefit"><span class="icon"><svg width="16" height="15" viewBox="0 0 16 15" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7.89844" cy="7.83008" r="6.67188" stroke="#747473"/><path d="M4.82812 7.82785C5.23795 8.23767 6.36496 9.36468 6.87723 9.87695L10.4632 6.29102" stroke="#747473" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Free shipping on your first order</div>
+    </div>
+  </label>
+
+  <!-- One Time Purchase -->
+  <label class="option-card{% unless product.selected_selling_plan %} selected{% endunless %}">
+    <input type="radio" name="purchase_type"{% unless product.selected_selling_plan %} checked{% endunless %}>
+    <div class="first-time-tag">First time buyer?</div>
+    <div class="option-header">
+      <div class="left">
+        <div class="option-title">One Time Purchase</div>
+      </div>
+      <div class="right">
+        <div class="price-wrapper">
+          {% if compare_price != blank and variant.compare_at_price > variant.price %}
+            <span class="price-strike">{{ compare_price }}</span>
+          {% endif %}
+          <span class="price">{{ reg_price }}</span>
+        </div>
+      </div>
+    </div>
+  </label>
+</div>
+
+<style>
+.shopify-app-block.recharge-subscription-widget {
+  display: none;
+}
+.purchase-options {
+  font-family: 'Helvetica Neue', sans-serif;
+  color: #000;
+  max-width: 600px;
+  margin: auto;
+}
+
+.option-card {
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  padding: 20px 20px 16px 55px;
+  margin-bottom: 16px;
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.option-card.selected {
+  border-color: #000;
+}
+
+.option-card input[type="radio"] {
+  position: absolute;
+  left: 20px;
+  top: 24px;
+  width: 18px;
+  height: 18px;
+  accent-color: #000;
+  border: 2px solid #000;
+  border-radius: 50%;
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.option-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.option-subtitle {
+  font-size: 14px;
+  color: #e60000;
+  font-weight: 500;
+}
+
+.highlight-red {
+  color: #e60000;
+  font-weight: bold;
+}
+
+.price-wrapper {
+    text-align: right;
+    text-align: right;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.price-strike {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 16px;
+  display: block;
+}
+
+.price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+  display: block;
+  margin-top: -2px;
+}
+
+.price-note {
+  font-size: 13px;
+  color: #777;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.option-details {
+  border-top: 1px solid #ccc;
+  margin-top: 16px;
+  padding-top: 16px;
+  font-size: 14px;
+  margin-left: -35px;
+}
+.frequency-selector {
+  margin-top: 16px;
+  margin-left: -35px;
+}
+
+.frequency-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+.frequency-dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.benefit {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.icon {
+  font-size: 16px;
+}
+.recommended-tag,
+.first-time-tag {
+  position: absolute;
+  top: -15px;
+  right: 8px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.recommended-tag {
+  background: #111;
+  color: #fff;
+}
+
+.first-time-tag {
+  background: #eee;
+  color: #000;
+}
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const customRadios = document.querySelectorAll('input[name="purchase_type"]');
+    const customCards = document.querySelectorAll('.option-card');
+    function syncCustom(customIndex) {
+      customRadios.forEach((radio, i) => {
+        radio.checked = i === customIndex;
+        customCards[i].classList.toggle('selected', i === customIndex);
+      });
+    }
+    function syncRecharge(customIndex) {
+      const rechargeOneRadio = document.querySelector('#rc-radio1');
+      const rechargeSubRadio = document.querySelector('#rc-radio2');
+      if (customIndex === 0 && rechargeSubRadio) {
+        rechargeSubRadio.checked = true;
+        rechargeSubRadio.dispatchEvent(new Event('change', { bubbles: true }));
+        resetFrequencyToFirst();
+      }
+      if (customIndex === 1 && rechargeOneRadio) {
+        rechargeOneRadio.checked = true;
+        rechargeOneRadio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    function resetFrequencyToFirst() {
+      const customSelect = document.querySelector('select[name="selling_plan"]');
+      const rechargeSelect = document.querySelector('select[name="rc_selling_plan"]');
+      if (customSelect && customSelect.options.length > 0) {
+        customSelect.selectedIndex = 0;
+        customSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      if (rechargeSelect && rechargeSelect.options.length > 0) {
+        rechargeSelect.selectedIndex = 0;
+        rechargeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    function setupSync() {
+      const rechargeOneRadio = document.querySelector('#rc-radio1'); // One-time
+      const rechargeSubRadio = document.querySelector('#rc-radio2'); // Subscribe
+      const customSelect = document.querySelector('select[name="selling_plan"]');
+      const rechargeSelect = document.querySelector('select[name="rc_selling_plan"]');
+      if (!rechargeOneRadio || !rechargeSubRadio) return false;
+      rechargeSubRadio.addEventListener('change', () => syncCustom(0));
+      rechargeOneRadio.addEventListener('change', () => syncCustom(1));
+      customRadios.forEach((radio, i) => {
+        radio.addEventListener('change', () => {
+          if (radio.checked) {
+            syncCustom(i);
+            syncRecharge(i);
+          }
+        });
+      });
+      if (customSelect) {
+        customSelect.addEventListener('change', () => {
+          const rechargeSelect = document.querySelector('select[name="rc_selling_plan"]');
+          if (rechargeSelect) {
+            rechargeSelect.value = customSelect.value;
+            rechargeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      }
+      const observeRechargeFrequency = () => {
+        const rechargeSelect = document.querySelector('select[name="rc_selling_plan"]');
+        if (!rechargeSelect) return;
+        rechargeSelect.addEventListener('change', () => {
+          if (customSelect) {
+            customSelect.value = rechargeSelect.value;
+          }
+        });
+      };
+      const frequencyObserver = new MutationObserver(observeRechargeFrequency);
+      frequencyObserver.observe(document.body, { childList: true, subtree: true });
+      syncCustom(1);
+      syncRecharge(1);
+      return true;
+    }
+    let tries = 0;
+    const maxTries = 10;
+    const interval = setInterval(() => {
+      if (setupSync()) {
+        clearInterval(interval);
+      } else if (++tries >= maxTries) {
+        clearInterval(interval);
+        console.warn("Recharge widget not detected in time");
+      }
+    }, 300);
+  });
+</script>
